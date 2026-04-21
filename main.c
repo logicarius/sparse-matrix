@@ -1,36 +1,44 @@
 #include <stdio.h>
 #include "sparse_utils.h"
 
-struct Entry
+int values[MAX_LINES * 10]; // all frequencies - 10 sentences x 10 words
+int col_index[MAX_LINES * 10]; // which word (how many entries u store ,not range of values inside it therefore not 32)
+int row_ptr[MAX_LINES + 1]; // 11 slots
+
+int total = 0; // non-zero entries so far (counter)
+
+void buildCSR()
 {
-    int col;
-    int val;
-};
-
-int rowSize[MAX_LINES] = {0}; //global
-
-struct Entry new_matrix[MAX_LINES][MAX_WORDS]; //global
-
-void buildSparse() 
-{
-    int row;
-    int column; 
-    
-    for(row=0; row<lineCount; row++) //sentence - row
+    int row,col;
+    for(row = 0; row < lineCount; row++) // loops over every sentence
     {
-        for(column=0; column<wordCount; column++) //word - column
+        row_ptr[row] = total; // before processing sentence row, puts checkpoint
+        for(col = 0; col < wordCount; col++) // loops every word in vocabulary for this sentence
         {
-            if(matrix[row][column] != 0)
+            if(matrix[row][col] != 0) // only cares about words that actually appear 
             {
-                new_matrix[row][rowSize[row]].col = column; // storing
-                new_matrix[row][rowSize[row]].val = matrix[row][column]; //storing
-                
-                rowSize[row]++; // increment
+                values[total] = matrix[row][col];
+                col_index[total] = col;
+                total++;
+                // store the frequency, store which word, move to next slot
             }
         }
     }
+    row_ptr[lineCount] = total; // mark the end when the last sentence is done
 }
 
+void printCSR()
+{
+    for(int i = 0; i < lineCount; i++)
+    {
+        printf("Sentence %d: ", i);
+        for(int j = row_ptr[i]; j < row_ptr[i+1]; j++)
+        {
+            printf("(%s , %d) ", words[col_index[j]], values[j]);
+        }
+        printf("\n");
+    }
+}
 
 void printAll() {
     printf("--- Original Text ---\n");
@@ -52,27 +60,14 @@ void printAll() {
     }
 }
 
-void printSparse() 
+int main() 
 {
-    for(int i = 0; i<MAX_LINES; i++)
-        {
-            printf("\nSentence %d: ",i);
-            for(int j = 0; j<rowSize[i]; j++)
-            {
-                printf("col: %d val: %d  ", new_matrix[i][j].col, new_matrix[i][j].val);
-            }
-            printf("\n");
-        }
-}
-
-int main() {
-    
     // Logic is hidden away in sparse_utils
     
     buildMatrix(); // builds original matrix
-    buildSparse(); // converts to your representation
     printAll(); // Display results
-    printSparse(); //Display new matrix
+    buildCSR(); // converts to your representation
+    printCSR(); //Display new matrix
 
     return 0;
 }

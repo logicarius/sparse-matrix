@@ -1,14 +1,31 @@
-#include <stdio.h>
-#include "sparse_utils.h"
+#include <stdio.h> 
+#include <stdlib.h> // for dynamic memory allocation
+#include <string.h> // for searching words
+#include "sparse_utils.h" // for using other files provided
 
-int values[MAX_LINES * 10]; // all frequencies - 10 sentences x 10 words
-int col_index[MAX_LINES * 10]; // which word (how many entries u store ,not range of values inside it therefore not 32)
+int *values; // stores all non-zero frequencies
+int *col_index; // stores which word each value belongs to (how many entries u store ,not range of values inside it therefore not 32)
 int row_ptr[MAX_LINES + 1]; // 11 slots
 
 int total = 0; // non-zero entries so far (counter)
 
 void buildCSR()
 {
+    // counting loops for mallocing later
+    int  total_nonzero = 0;
+    for(int r = 0; r < lineCount; r++)
+    {
+        for(int c = 0; c < wordCount; c++)
+        {
+            if(matrix[r][c] != 0)
+                total_nonzero++ ;
+        }
+    }
+    // loop ended now malloc
+    values = malloc(total_nonzero * sizeof(int));
+    col_index = malloc(total_nonzero * sizeof(int));
+
+    // basic body
     int row,col;
     for(row = 0; row < lineCount; row++) // loops over every sentence
     {
@@ -31,13 +48,35 @@ void printCSR()
 {
     for(int i = 0; i < lineCount; i++)
     {
-        printf("Sentence %d: ", i);
+        printf("\nSentence %d: [%s]\n", i, lines[i]);
         for(int j = row_ptr[i]; j < row_ptr[i+1]; j++)
         {
             printf("(%s , %d) ", words[col_index[j]], values[j]);
         }
         printf("\n");
     }
+}
+
+void searchWord(char *word)
+{
+    // find col index of word in words[]
+    int target = -1;
+    for(int i = 0; i < wordCount; i++)
+        if(strcmp(words[i], word) == 0)
+            target = i;
+    
+    if(target == -1)
+    {
+        printf("Word not found\n");
+        return;
+    }
+
+    // loop through sentences
+    printf("\n'%s' found in:\n", word);
+    for(int i = 0; i < lineCount; i++)
+        for(int j = row_ptr[i]; j < row_ptr[i+1]; j++)
+            if(col_index[j] == target)
+                printf("  Sentence %d: [%s] (freq: %d)\n", i, lines[i], values[j]);
 }
 
 void printAll() {
@@ -52,7 +91,7 @@ void printAll() {
     printf("\n\n--- Sparse Matrix (Frequencies) ---\n");
     for(int i = 0; i < lineCount; i++) {
         for(int j = 0; j < wordCount; j++) {
-            // Using a dot for zeros makes sparsity visually obvious
+            // using a dot for zeros makes sparsity visually obvious
             if (matrix[i][j] == 0) printf(". ");
             else printf("%d ", matrix[i][j]);
         }
@@ -65,9 +104,15 @@ int main()
     // Logic is hidden away in sparse_utils
     
     buildMatrix(); // builds original matrix
-    printAll(); // Display results
+    printAll(); // display results
     buildCSR(); // converts to your representation
-    printCSR(); //Display new matrix
+    printCSR(); // display new matrix 
+
+    // taking the search input from user
+    char query[50];
+    printf("\nEnter word to search: ");
+    scanf("%s", query);
+    searchWord(query);
 
     return 0;
 }

@@ -14,7 +14,7 @@ void buildDynamic()
 {
     int row, col;
     
-    //count and malloc
+    //count and malloc (pass 1)
     for(row = 0; row < lineCount; row++)
     {
         for(col = 0; col < wordCount; col++)
@@ -25,8 +25,8 @@ void buildDynamic()
         dynamic_matrix[row] = malloc(rowSize[row] * sizeof(struct Entry));
     }
     
-    // Pass 2 - store entries
-    // rowSize[row] is already full from Pass 1. If you use it again as a counter, it will be overwritten
+    // pass 2 is for storing entries
+    // rowSize[row] is already full from pass 1 so if you use it again as a counter it would be overwritten
     int pos[MAX_LINES] = {0};  // current position in each row
 
     for(row = 0; row < lineCount; row++)
@@ -50,7 +50,7 @@ void printDynamic()
             printf("\nSentence %d: ",i);
             for(int j = 0; j<rowSize[i]; j++)
             {
-                printf("%s - %d  ", words[dynamic_matrix[i][j].col], dynamic_matrix[i][j].val);
+                printf("%s: %d  ", words[dynamic_matrix[i][j].col], dynamic_matrix[i][j].val);
             }
             printf("\n");
         }
@@ -68,7 +68,7 @@ void printAll() {
     printf("\n\n--- Sparse Matrix (Frequencies) ---\n");
     for(int i = 0; i < lineCount; i++) {
         for(int j = 0; j < wordCount; j++) {
-            // Using a dot for zeros makes sparsity visually obvious
+            // using a dot for zeros makes sparsity visually clear
             if (matrix[i][j] == 0) printf(". ");
             else printf("%d ", matrix[i][j]);
         }

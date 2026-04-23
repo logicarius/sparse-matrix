@@ -59,7 +59,7 @@ void printSparse()
             printf("\nSentence %d: ",i);
             for(int j = 0; j<rowSize[i]; j++)
             {
-                printf("col: %d val: %d  ", new_matrix[i][j].col, new_matrix[i][j].val);
+                printf("(%d , %d) ", new_matrix[i][j].col, new_matrix[i][j].val);
             }
             printf("\n");
         }

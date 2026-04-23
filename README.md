@@ -23,6 +23,11 @@ Better, but uses a struct which adds overhead.
 Used CSR namely 3 flat int arrays instead of a struct.
 Counted non-zeros first, then malloced exactly that much.
 Added word search which a user can find which sentences contain any word.
+
+I chose CSR over my first array-based attempt (main2.c) because main2.c still allocated MAX_LINES × MAX_WORDS slots which is the same size as the original matrix. 
+CSR with dynamic malloc allocates only total_nonzero slots, which in this dataset is ~60 instead of 1000. 
+CSR also separates row boundaries using row_ptr[] which makes row access cleaner and faster
+
 I chose CSR over a linked list because linked list access is O(n) since you have to traverse the whole list to find an entry. 
 On the other hand CSR gives direct row access via row_ptr[] in O(1).
 

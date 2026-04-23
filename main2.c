@@ -54,7 +54,7 @@ void printAll() {
 
 void printSparse() 
 {
-    for(int i = 0; i<MAX_LINES; i++)
+    for(int i = 0; i<lineCount; i++)
         {
             printf("\nSentence %d: ",i);
             for(int j = 0; j<rowSize[i]; j++)

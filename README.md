@@ -8,6 +8,9 @@ The original matrix is 10x100 = 1000 slots, 4000 bytes.
 Most entries are zero since each sentence only uses 6-7 words out of 33. 
 Storing zeros wastes memory.
 
+## The shared base (sparse_utils)
+All three versions read from the same place. `sparse_utils.c` holds the 10 sentences and `buildMatrix()` turns them into the original word frequency matrix, while `sparse_utils.h` declares the shared variables. I kept this in one file so that main2.c, main3.c and main.c only differ in how they store the sparse matrix, not in how it gets built.
+
 ## My Journey
 
 ### main2.c — First Attempt (Array-based struct)

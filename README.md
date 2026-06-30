@@ -9,16 +9,16 @@ Most entries are zero since each sentence only uses 6-7 words out of 33.
 Storing zeros wastes memory.
 
 ## The shared base (sparse_utils)
-All three versions read from the same place. `sparse_utils.c` holds the 10 sentences and `buildMatrix()` turns them into the original word frequency matrix, while `sparse_utils.h` declares the shared variables. I kept this in one file so that main2.c, main3.c and main.c only differ in how they store the sparse matrix, not in how it gets built.
+All three versions read from the same place. `sparse_utils.c` holds the 10 sentences and `buildMatrix()` turns them into the original word frequency matrix, while `sparse_utils.h` declares the shared variables. I kept this in one file so that attempt1.c, attempt2.c and main.c only differ in how they store the sparse matrix, not in how it gets built.
 
 ## My Journey
 
-### main2.c — First Attempt (Array-based struct)
+### attempt1.c — First Attempt (Array-based struct)
 Used a struct Entry with col and val fields stored in a 2D array. 
 Still allocates MAX_LINES x MAX_WORDS slots even if unused. 
 Same memory problem as original.
 
-### main3.c — Dynamic Malloc per Row
+### attempt2.c — Dynamic Malloc per Row
 Fixed the waste by using malloc per row which allocates exactly rowSize[i] slots per sentence. 
 Better, but uses a struct which adds overhead.
 
@@ -27,7 +27,7 @@ Used CSR namely 3 flat int arrays instead of a struct.
 Counted non-zeros first, then malloced exactly that much.
 Added word search which a user can find which sentences contain any word.
 
-I chose CSR over my first array-based attempt (main2.c) because main2.c still allocated MAX_LINES × MAX_WORDS slots which is the same size as the original matrix. 
+I chose CSR over my first array-based attempt (attempt1.c) because attempt1.c still allocated MAX_LINES × MAX_WORDS slots which is the same size as the original matrix. 
 CSR with dynamic malloc allocates only total_nonzero slots, which in this dataset is ~60 instead of 1000. 
 CSR also separates row boundaries using row_ptr[] which makes row access cleaner and faster
 
